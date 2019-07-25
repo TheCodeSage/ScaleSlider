@@ -7,10 +7,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
 
-    <StackLayout BackgroundColor="White">
+    <StackLayout BackgroundColor="#123456">
         
         <local:ScaleSlider Margin="50"
-                           HeightRequest="120" VerticalOptions="Center" />
+                           HeightRequest="150" VerticalOptions="Center" />
     </StackLayout>
 
 </ContentPage>

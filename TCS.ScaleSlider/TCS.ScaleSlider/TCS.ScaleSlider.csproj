@@ -15,4 +15,13 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.2.0" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="1.68.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Images\thumb.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\thumb.png" />
+  </ItemGroup>
 </Project>

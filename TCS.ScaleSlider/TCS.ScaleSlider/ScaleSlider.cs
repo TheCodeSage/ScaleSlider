@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using Xamarin.Forms;
@@ -56,11 +58,12 @@ namespace TCS.ScaleSlider
 		"C659.363,514.539,655.382,501.489,645.527,495.815z");
         SKPath flamePath = SKPath.ParseSvgPathData("m 272.52 14.9474 c -16.2302 24.5973 -17.4755 78.1656 29.2314 119.746 c 53.8522 62.6036 67.5295 109.715 66.9073 200.416 c -0.509277 74.2204 -27.8441 93.2647 -51.638 159.496 c -28.1106 62.1287 -36.6324 91.9828 -16.2932 139.955 c 7.19458 20.9159 18.3852 35.8378 32.5727 59.7507 c -22.1169 -16.8237 -42.2359 -27.6533 -62.3548 -57.4643 c -18.7044 -32.9255 -33.5567 -47.0742 9.24673 -181.784 c 9.97049 -31.4617 23.941 -78.9233 28.9115 -111.385 c 1.88596 -22.175 -0.228119 -55.1872 -13.3422 -82.5249 c -36.9366 -55.1982 -46.0503 -50.6029 -94.3781 -82.5947 c 26.6839 54.7657 11.9302 80.4417 -65.2991 189.404 c -64.8983 105.166 -92.705 145.266 -88.2346 216.222 c 5.40698 85.8187 51.5296 158.437 131.83 217.835 c 26.2463 19.4145 49.0346 23.8444 65.5073 30.3935 l 49.8302 11.356 c -20.1858 -13.9612 -37.3716 -21.9225 -60.5575 -41.8837 c -47.7772 -48.4941 -75.3477 -108.336 -80.3781 -174.113 c -2.99034 -39.1024 3.53917 -88.0878 5.37561 -48.1385 c 1.15854 7.98285 6.21541 33.6515 10.2153 39.1595 c 8 21.7531 44.8939 81.6156 78.3542 118.189 "+
             "c 16.868 18.4372 51.5417 50.5283 78.0982 68.8192 c 48.4027 26.7632 69.8055 30.5266 106.208 35.2898 c 31.4167 0 69.7298 -5.58649 57.0121 -4.74786 c -65.1008 -96.363 -67.4874 -100.771 -71.1962 -162.025 c 0.269073 -56.621 20.4073 -69.1729 55.6531 -139.949 c 43.7987 -87.951 54.7549 -126.973 55.0359 -192.315 c 0.407776 -94.7442 -39.7695 -144.993 -127.547 -197.892 c -24.447 -13.8481 -31.1063 -17.7477 -75.7454 -37.491 c -25.6674 -13.592 -51.3347 -43.1679 -53.0262 -91.725 Z m 301.747 266.493 c 22.8541 34.8291 42.7187 86.6412 44.5855 123.468 c -5.0578 48.065 -5.32617 51.3993 -60.832 121.797 c -23.087 33.7209 -36.707 54.6631 -42.7421 68.4755 c -17.084 39.1011 -17.5841 137.039 10.4884 190.179 l 23.2943 44.3066 l 10.2393 -33.0503 c 7.87659 -25.2731 18.4775 -56.6924 73.2604 -97.0023 c 69.2085 -61.2578 79.8633 -79.2551 89.9311 -156.302 c 1.05603 -50.9854 -5.43793 -88.1528 -38.299 -148.558 c -34.2954 -56.0865 -64.6212 -74.2108 -109.926 -113.314 Z");
+        SKBitmap thumbImage;
 
         float sliderPosition;
         float sliderLeftBounds;
         float sliderRightBounds;
-
+        float bottomPadding = 70;
         #endregion Properties
 
         #region Constructor
@@ -86,10 +89,11 @@ namespace TCS.ScaleSlider
 
             using (new SKAutoCanvasRestore(canvas))
             {
-                UpdateClippingMask(canvas, info);
+
                 
+                DrawClippingMask(canvas, info);
                 //Draw Gradient Rectangle
-                SKRect bounds = new SKRect(0, 0, info.Width, info.Height);
+                SKRect bounds = new SKRect(0, 0, info.Width, info.Height- bottomPadding);
                 canvas.DrawRoundRect(bounds, 20, 20, backgroundBrush);
 
                 //Create tick marks
@@ -98,8 +102,9 @@ namespace TCS.ScaleSlider
                 DrawSnowflake(canvas, info);
                 DrawFlame(canvas, info);
                 DrawLabel(canvas, info);
-
             }
+
+            DrawThumbImage(canvas, info);
 
 
         }
@@ -122,6 +127,13 @@ namespace TCS.ScaleSlider
 
         #region Methods
 
+        void DrawThumbImage(SKCanvas canvas, SKImageInfo info)
+        {
+            //Move thumb
+            var xPos = sliderPosition;
+            canvas.DrawBitmap(thumbImage, clipPath.TightBounds.MidX - (thumbImage.Width/2), clipPath.TightBounds.MidY-50);
+        }
+
         void DrawFlame(SKCanvas canvas, SKImageInfo info)
         {
             canvas.DrawPath(flamePath, new SKPaint { StrokeWidth = 2, Color = Color.FromHex("#45FFFFFF").ToSKColor() });
@@ -141,7 +153,7 @@ namespace TCS.ScaleSlider
             canvas.DrawText(text, new SKPoint(60, info.Height / 2), new SKPaint { StrokeWidth = 2, Color = Color.White.ToSKColor(), TextSize = 120 });
         }
 
-        void UpdateClippingMask(SKCanvas canvas, SKImageInfo info)
+        void DrawClippingMask(SKCanvas canvas, SKImageInfo info)
         {
             //Move clipping mask
             var xPos = sliderPosition - clipPath.TightBounds.MidX;
@@ -171,20 +183,30 @@ namespace TCS.ScaleSlider
 
             //Clipping path Transform
             clipPath.Transform(SKMatrix.MakeScale(4,4));
-            var clipYPos = info.Height - clipPath.TightBounds.Height;
+            var clipYPos = info.Height - clipPath.TightBounds.Height - bottomPadding;
             clipPath.Transform(SKMatrix.MakeTranslation(info.Width/2, clipYPos));
 
             //Snowflake path transform
             snowFlakePath.Transform(SKMatrix.MakeScale(.4f, .4f));
-            snowFlakePath.Transform(SKMatrix.MakeTranslation(50, (info.Height / 2) - (snowFlakePath.TightBounds.Height / 2)));
+            snowFlakePath.Transform(SKMatrix.MakeTranslation(50, (info.Height / 2) - (snowFlakePath.TightBounds.Height / 2) - bottomPadding));
 
             //Flame path transform
-            flamePath.Transform(SKMatrix.MakeScale(.4f, .4f));
-            flamePath.Transform(SKMatrix.MakeTranslation(info.Width-flamePath.TightBounds.Width-50, (info.Height / 2)-(flamePath.TightBounds.Height/2)));
+            flamePath.Transform(SKMatrix.MakeScale(.35f, .35f));
+            flamePath.Transform(SKMatrix.MakeTranslation(info.Width-flamePath.TightBounds.Width-50, (info.Height / 2)-(flamePath.TightBounds.Height / 2) - bottomPadding));
 
             //Setup slider bounds
             sliderLeftBounds = clipPath.TightBounds.Width / 8;
             sliderRightBounds = info.Width - (clipPath.TightBounds.Width / 8);
+
+            //Thumb Image transform
+            string resourceID = "TCS.ScaleSlider.Images.thumb.png";
+            Assembly assembly = GetType().GetTypeInfo().Assembly;
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceID))
+            {
+                thumbImage = SKBitmap.Decode(stream);
+            }
+
 
         }
 
@@ -192,11 +214,11 @@ namespace TCS.ScaleSlider
         {
             var numTicks = 15;
             var distance = info.Width / numTicks;
-            var tickHeight = 50;
+            var tickHeight = 60;
             for (int i = 1; i < numTicks; i++)
             {
-                var start = new SKPoint(i * distance, info.Height);
-                var end = new SKPoint(i * distance, info.Height - (tickHeight));
+                var start = new SKPoint(i * distance, info.Height - bottomPadding);
+                var end = new SKPoint(i * distance, info.Height-bottomPadding - (tickHeight));
 
                 tickBrush.Shader = SKShader.CreateLinearGradient(
                                          start,
