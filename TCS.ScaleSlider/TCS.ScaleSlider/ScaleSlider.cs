@@ -64,6 +64,7 @@ namespace TCS.ScaleSlider
         float sliderLeftBounds;
         float sliderRightBounds;
         float bottomPadding = 70;
+        float sidePadding = 100;
         #endregion Properties
 
         #region Constructor
@@ -93,7 +94,7 @@ namespace TCS.ScaleSlider
                 
                 DrawClippingMask(canvas, info);
                 //Draw Gradient Rectangle
-                SKRect bounds = new SKRect(0, 0, info.Width, info.Height- bottomPadding);
+                SKRect bounds = new SKRect(sidePadding, 0, info.Width - sidePadding, info.Height- bottomPadding);
                 canvas.DrawRoundRect(bounds, 20, 20, backgroundBrush);
 
                 //Create tick marks
@@ -150,7 +151,7 @@ namespace TCS.ScaleSlider
             var text = Math.Floor(slidePercent * 100).ToString();
 
 
-            canvas.DrawText(text, new SKPoint(60, info.Height / 2), new SKPaint { StrokeWidth = 2, Color = Color.White.ToSKColor(), TextSize = 120 });
+            canvas.DrawText(text, new SKPoint(60+sidePadding, info.Height / 2), new SKPaint { StrokeWidth = 2, Color = Color.White.ToSKColor(), TextSize = 120 });
         }
 
         void DrawClippingMask(SKCanvas canvas, SKImageInfo info)
@@ -187,16 +188,16 @@ namespace TCS.ScaleSlider
             clipPath.Transform(SKMatrix.MakeTranslation(info.Width/2, clipYPos));
 
             //Snowflake path transform
-            snowFlakePath.Transform(SKMatrix.MakeScale(.4f, .4f));
-            snowFlakePath.Transform(SKMatrix.MakeTranslation(50, (info.Height / 2) - (snowFlakePath.TightBounds.Height / 2) - bottomPadding));
+            snowFlakePath.Transform(SKMatrix.MakeScale(.3f, .3f));
+            snowFlakePath.Transform(SKMatrix.MakeTranslation(100+sidePadding, (info.Height / 2) - (snowFlakePath.TightBounds.Height / 2) - bottomPadding));
 
             //Flame path transform
-            flamePath.Transform(SKMatrix.MakeScale(.35f, .35f));
-            flamePath.Transform(SKMatrix.MakeTranslation(info.Width-flamePath.TightBounds.Width-50, (info.Height / 2)-(flamePath.TightBounds.Height / 2) - bottomPadding));
+            flamePath.Transform(SKMatrix.MakeScale(.25f, .25f));
+            flamePath.Transform(SKMatrix.MakeTranslation(info.Width-flamePath.TightBounds.Width-110-sidePadding, (info.Height / 2)-(flamePath.TightBounds.Height / 2) - bottomPadding));
 
             //Setup slider bounds
-            sliderLeftBounds = clipPath.TightBounds.Width / 8;
-            sliderRightBounds = info.Width - (clipPath.TightBounds.Width / 8);
+            sliderLeftBounds = clipPath.TightBounds.Width / 3;
+            sliderRightBounds = info.Width - (clipPath.TightBounds.Width /3);
 
             //Thumb Image transform
             string resourceID = "TCS.ScaleSlider.Images.thumb.png";
@@ -213,22 +214,26 @@ namespace TCS.ScaleSlider
         void CreateTickMarks(SKCanvas canvas, SKImageInfo info)
         {
             var numTicks = 15;
-            var distance = info.Width / numTicks;
+            var distance = (info.Width - sidePadding*2) / numTicks;
             var tickHeight = 60;
+
+
             for (int i = 1; i < numTicks; i++)
             {
-                var start = new SKPoint(i * distance, info.Height - bottomPadding);
-                var end = new SKPoint(i * distance, info.Height-bottomPadding - (tickHeight));
+               
+                    var start = new SKPoint(i * distance +sidePadding, info.Height - bottomPadding);
+                    var end = new SKPoint(i * distance+sidePadding, info.Height - bottomPadding - (tickHeight));
+                
+
 
                 tickBrush.Shader = SKShader.CreateLinearGradient(
-                                         start,
-                                         end,
-                                         new SKColor[] { new SKColor(255, 255, 255, 200), new SKColor(255, 255, 255, 0) },
-                                         new float[] { 0, 1 },
-                                         SKShaderTileMode.Clamp);
+                    start,
+                    end,
+                    new SKColor[] {new SKColor(255, 255, 255, 200), new SKColor(255, 255, 255, 0)},
+                    new float[] {0, 1},
+                    SKShaderTileMode.Clamp);
 
                 canvas.DrawLine(start, end, tickBrush);
-
             }
 
         }
